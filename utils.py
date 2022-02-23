@@ -30,7 +30,7 @@ async def get_user(token: str = Depends(oauth2_passord_bearer)) -> User:
     user = await UserModel.get(username=jwt_token.sub)
     if not user:
         raise exception
-    return User.parse_obj(user)
+    return user
 
 
 def get_current_active_user(user: User = Depends(get_user)):

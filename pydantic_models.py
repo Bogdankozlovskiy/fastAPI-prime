@@ -12,6 +12,15 @@ class AccessToken(BaseModel):
     access_token: str = Field(...)
 
 
+class Item(BaseModel):
+    title: str = Field(...)
+    date_created: datetime = Field(...)
+    user_id: int = Field(None)
+
+    class Config:
+        orm_mode = True
+
+
 class User(BaseModel):
     username: str = Field(...)
     email: EmailStr = Field(...)

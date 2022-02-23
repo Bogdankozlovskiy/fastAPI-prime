@@ -3,12 +3,13 @@ from fastapi import Depends, status, HTTPException, Body
 
 from jose import jwt
 from datetime import datetime, timedelta
+from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
 
 from application import app
 from utils import get_current_active_user, pwd_context
-from pydantic_models import JWTToken, User, AccessToken, UserRegister
+from pydantic_models import JWTToken, User, AccessToken, UserRegister, Item
 from settings import tokenUrl, ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
-from models import User as UserModel
+from models import User as UserModel, Item as ItemModel
 
 
 @app.post(tokenUrl, include_in_schema=False, response_model=AccessToken)
@@ -46,3 +47,11 @@ async def register(user: UserRegister = Body(...)):
         hash_password=pwd_context.hash(user.password._secret_value)
     )
     return user
+
+
+@app.post("/items/create", tags=['items'], response_model=Item)
+async def create_item(item: Item = Body(...), user: User = Depends(get_current_active_user)):
+    return await ItemModel.create(
+        **item.dict(exclude={"user_id"}),
+        user_id=user.id
+    )
