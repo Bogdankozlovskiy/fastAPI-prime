@@ -8,3 +8,4 @@ origins = [
     "http://localhost",
     "http://localhost:8080",
 ]
+SQLALCHEMY_DATABASE_URL = "postgresql://sqlalchemy_user:sqlpwd@localhost:5432/sqlalchemy_db"
