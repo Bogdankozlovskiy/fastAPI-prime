@@ -21,6 +21,7 @@ app.add_middleware(
 @app.middleware("http")
 async def add_prcess_time_header(request: Request, call_next: Callable):
     start_time = time()
+    # request.state  in state we can add whanever we want, for exaple user, like request.state.user = user
     respose = await call_next(request)
     process_time = time() - start_time
     respose.headers["X-Process-Time"] = str(process_time)
