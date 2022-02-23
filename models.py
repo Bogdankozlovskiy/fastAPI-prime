@@ -1,5 +1,8 @@
 from tortoise.models import Model
 from tortoise import fields
+# aerich init -h
+# aerich init -t settings.TORTOISE_ORM
+# aerich init-db
 
 
 class User(Model):

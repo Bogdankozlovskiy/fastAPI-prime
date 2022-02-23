@@ -15,9 +15,15 @@ passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 pytest = "^7.0.1"
 jose = "^1.0.0"
 tortoise-orm = {extras = ["asyncpg"], version = "^0.18.1"}
+aerich = "^0.6.2"
 
 [tool.poetry.dev-dependencies]
 
+
+[tool.aerich]
+tortoise_orm = "settings.TORTOISE_ORM"
+location = "./migrations"
+src_folder = "./."
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

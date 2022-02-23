@@ -3,16 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 from time import time
 from typing import Callable
+from settings import TORTOISE_ORM, origins
 
 
 app = FastAPI()
-
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-]
 
 
 app.add_middleware(
@@ -35,8 +29,7 @@ async def add_prcess_time_header(request: Request, call_next: Callable):
 
 register_tortoise(
     app,
-    db_url="postgres://peewee_user:1234@localhost:5432/peewee_db",
-    modules={"models": ['models']},
+    config=TORTOISE_ORM,
     generate_schemas=True,
     add_exception_handlers=True
 )
