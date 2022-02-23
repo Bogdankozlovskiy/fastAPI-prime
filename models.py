@@ -3,9 +3,11 @@ from sqlalchemy import Boolean, Column, DateTime, Integer, String, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 #  alembic init migrations
-#  alembic revision
+#  alembic revision -m "my custom migrate"
 #  alembic revision --autogenerate
 #  alembic upgrade head
+#  alembic upgrade +2
+#  alembic downgrade -1
 
 
 class User(Base):
