@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from time import time
 from typing import Callable
 from settings import origins
-
+from database import db
 
 app = FastAPI()
 
@@ -24,3 +24,14 @@ async def add_prcess_time_header(request: Request, call_next: Callable):
     process_time = time() - start_time
     respose.headers["X-Process-Time"] = str(process_time)
     return respose
+
+
+@app.on_event("startup")
+async def startup():
+    await db.connect()
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await db.disconnect()
+

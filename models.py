@@ -30,7 +30,7 @@ class Item(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String(150))
-    number = Column(Integer, default=0)
+    # number = Column(Integer, default=0)
     date_created = Column(DateTime(timezone=True), server_default=func.now())
     user_id = Column(Integer, ForeignKey("users.id"))
 
