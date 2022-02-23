@@ -2,6 +2,10 @@ from database import Base
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+#  alembic init alembic
+#  alembic revision
+#  alembic revision --autogenerate
+#  alembic upgrade head
 
 
 class User(Base):
