@@ -6,7 +6,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timezone
 
 from settings import tokenUrl, ALGORITHM, SECRET_KEY
-from pydantic_models import JWTToken, User
+from schemas import JWTToken, User
 from models import User as UserModel
 
 

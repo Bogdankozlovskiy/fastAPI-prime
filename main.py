@@ -7,7 +7,7 @@ from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_
 
 from application import app
 from utils import get_current_active_user, pwd_context
-from pydantic_models import JWTToken, User, AccessToken, UserRegister, Item
+from schemas import JWTToken, User, AccessToken, UserRegister, Item, ItemIn
 from settings import tokenUrl, ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
 from models import User as UserModel, Item as ItemModel
 
@@ -15,7 +15,7 @@ from models import User as UserModel, Item as ItemModel
 @app.post(tokenUrl, include_in_schema=False, response_model=AccessToken)
 async def login(user: OAuth2PasswordRequestForm = Depends()):
     db_user = await UserModel.get(username=user.username)
-    db_user_model = User.parse_obj(db_user)
+    db_user_model = User.from_orm(db_user)
     hashed_password = pwd_context.hash(user.password)
     if pwd_context.verify(db_user_model.hash_password, hashed_password):
         raise HTTPException(
@@ -50,8 +50,5 @@ async def register(user: UserRegister = Body(...)):
 
 
 @app.post("/items/create", tags=['items'], response_model=Item)
-async def create_item(item: Item = Body(...), user: User = Depends(get_current_active_user)):
-    return await ItemModel.create(
-        **item.dict(exclude={"user_id"}),
-        user_id=user.id
-    )
+async def create_item(item: ItemIn = Body(...), user: UserModel = Depends(get_current_active_user)):
+    return await ItemModel.create(**item.dict(), user_id=user.id)

@@ -22,6 +22,6 @@ class User(Model):
 
 class Item(Model):
     title = fields.CharField(max_length=150)
-    number = fields.IntField(default=0)
+    # number = fields.IntField(default=0)
     date_created = fields.DatetimeField(auto_now_add=True)
     user = fields.ForeignKeyField("models.User", related_name="items")
