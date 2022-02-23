@@ -12,9 +12,12 @@ class AccessToken(BaseModel):
     access_token: str = Field(...)
 
 
-class Item(BaseModel):
+class ItemIn(BaseModel):
     title: str = Field(...)
     date_created: datetime = Field(...)
+
+
+class Item(ItemIn):
     user_id: int = Field(None)
 
     class Config:

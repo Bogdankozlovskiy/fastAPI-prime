@@ -3,18 +3,28 @@ from fastapi.security import OAuth2PasswordBearer
 
 from passlib.context import CryptContext
 from jose import JWTError, jwt
+from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 
 from settings import tokenUrl, ALGORITHM, SECRET_KEY
 from schemas import JWTToken, User
 from models import User as UserModel
+from database import SessionLocal
 
 
 oauth2_passord_bearer = OAuth2PasswordBearer(tokenUrl=tokenUrl)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-async def get_user(token: str = Depends(oauth2_passord_bearer)) -> User:
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+async def get_user(token: str = Depends(oauth2_passord_bearer), db: Session = Depends(get_db)) -> User:
     exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="user un authenticated",
@@ -27,8 +37,8 @@ async def get_user(token: str = Depends(oauth2_passord_bearer)) -> User:
     jwt_token = JWTToken.parse_obj(payload)
     if jwt_token.exp < datetime.now(tz=timezone.utc):
         raise exception
-    user = await UserModel.get(username=jwt_token.sub)
-    if not user:
+    user = db.query(UserModel).filter(UserModel.username == jwt_token.sub).first()
+    if user is None:
         raise exception
     return user
 
