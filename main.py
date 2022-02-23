@@ -3,13 +3,15 @@ from fastapi import Depends, status, HTTPException, Body
 
 from jose import jwt
 from datetime import datetime, timedelta
-from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
 
 from application import app
 from utils import get_current_active_user, pwd_context
-from pydantic_models import JWTToken, User, AccessToken, UserRegister, Item
+from schemas import JWTToken, User, AccessToken, UserRegister, Item
 from settings import tokenUrl, ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
-from models import User as UserModel, Item as ItemModel
+from models import User as UserModel, Item as ItemModel, Base
+from database import engine
+
+Base.metadata.create_all(bind=engine)
 
 
 @app.post(tokenUrl, include_in_schema=False, response_model=AccessToken)
