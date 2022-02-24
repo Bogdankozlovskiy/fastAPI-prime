@@ -7,11 +7,11 @@ from fastapi import Query
 
 from models import User as UserModel
 from schemas import JWTToken, FullUser
-from settings import tokenUrl, ALGORITHM, SECRET_KEY
+from settings import tokenUrl, ALGORITHM, SECRET_KEY, scopes
 from utils import hello_world
 
 
-oauth2_passord_bearer = OAuth2PasswordBearer(tokenUrl=tokenUrl)
+oauth2_passord_bearer = OAuth2PasswordBearer(tokenUrl=tokenUrl, scopes=scopes)
 
 
 class CustomDepends:
