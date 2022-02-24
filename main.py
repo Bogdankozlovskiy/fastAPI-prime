@@ -10,8 +10,6 @@ from middlewares import add_prcess_time_header
 from settings import TORTOISE_ORM_DEV, TORTOISE_ORM_TEST, origins
 from routers import users_router, items_router
 
-from os import getenv
-
 
 def build_app(env="dev"):
     app = FastAPI()
