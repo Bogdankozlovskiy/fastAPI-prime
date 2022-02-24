@@ -2,9 +2,10 @@ from fastapi.testclient import TestClient
 from fastapi import status
 from tortoise.contrib.test import finalizer, initializer
 
-from os import remove
+from os import remove, path
 from pytest import fixture
 from typing import Generator
+from settings import TORTOISE_ORM_TEST
 
 from main import app
 from settings import tokenUrl
@@ -12,7 +13,9 @@ from settings import tokenUrl
 
 @fixture
 def client() -> Generator:
-    remove("db.sqlite3")
+    _, db_name = TORTOISE_ORM_TEST['connections']['default'].split("//")
+    if path.exists(db_name):
+        remove(db_name)
     with TestClient(app) as client:
         yield client
 
