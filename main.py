@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
@@ -23,5 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_prcess_time_header)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 register_tortoise(app, config=TORTOISE_ORM, add_exception_handlers=True)
