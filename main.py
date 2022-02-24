@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from tortoise.contrib.fastapi import register_tortoise
@@ -24,9 +24,4 @@ app.add_middleware(
 )
 app.add_middleware(BaseHTTPMiddleware, dispatch=add_prcess_time_header)
 
-
-register_tortoise(
-    app,
-    config=TORTOISE_ORM,
-    add_exception_handlers=True
-)
+register_tortoise(app, config=TORTOISE_ORM, add_exception_handlers=True)
