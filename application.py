@@ -31,6 +31,5 @@ async def add_prcess_time_header(request: Request, call_next: Callable):
 register_tortoise(
     app,
     config=TORTOISE_ORM,
-    generate_schemas=True,
     add_exception_handlers=True
 )
