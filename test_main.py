@@ -7,7 +7,7 @@ from pytest import fixture
 from typing import Generator
 from settings import TORTOISE_ORM_TEST
 
-from main import app
+from main import test_app as app
 from settings import tokenUrl
 
 

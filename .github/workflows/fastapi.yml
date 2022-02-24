@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ENV: test
     strategy:
       max-parallel: 4
       matrix:
@@ -28,5 +26,3 @@ jobs:
     - name: Run Tests
       run: |
         python -m poetry run pytest
-      env:
-        ENV: ${{ env.ENV }}

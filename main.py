@@ -35,4 +35,5 @@ def build_app(env="dev"):
     return app
 
 
-app = build_app(getenv("ENV", "dev"))
+app = build_app()
+test_app = build_app("test")
