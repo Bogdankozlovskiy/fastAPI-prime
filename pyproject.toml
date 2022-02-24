@@ -16,12 +16,13 @@ pytest = "^7.0.1"
 jose = "^1.0.0"
 tortoise-orm = {extras = ["asyncpg"], version = "^0.18.1"}
 aerich = "^0.6.2"
+requests = "^2.27.1"
 
 [tool.poetry.dev-dependencies]
 
 
 [tool.aerich]
-tortoise_orm = "settings.TORTOISE_ORM"
+tortoise_orm = "settings.TORTOISE_ORM_DEV"
 location = "./migrations"
 src_folder = "./."
 [build-system]

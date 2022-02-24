@@ -29,7 +29,7 @@ async def login(user: OAuth2PasswordRequestForm = Depends()):
         exp=datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     token = jwt.encode(jwt_token.dict(), key=SECRET_KEY, algorithm=ALGORITHM)
-    return AccessToken(access_token=token)
+    return {"access_token": token}
 
 
 @router.get("/users/me", tags=['users'], response_model=UserOut)
@@ -37,7 +37,7 @@ async def user_me(user: FullUser = Depends(get_current_active_user)):
     return user
 
 
-@router.post("/users/register", tags=['users'], response_model=UserOut)
+@router.post("/users/register", tags=['users'], response_model=UserOut, status_code=status.HTTP_201_CREATED)
 async def register(user: UserRegister = Body(...)):
     return await UserModel.create(
         username=user.username,
