@@ -3,11 +3,12 @@ from fastapi import Depends, status, HTTPException, Body
 
 from jose import jwt
 from datetime import datetime, timedelta
+from typing import List
 from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
 
 from application import app
 from utils import get_current_active_user, pwd_context
-from schemas import JWTToken, User, AccessToken, UserRegister, Item, ItemIn
+from schemas import JWTToken, User, UserOut, FullUser, AccessToken, UserRegister, Item, ItemIn
 from settings import tokenUrl, ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
 from models import User as UserModel, Item as ItemModel
 
@@ -30,12 +31,12 @@ async def login(user: OAuth2PasswordRequestForm = Depends()):
     return AccessToken(access_token=token)
 
 
-@app.get("/users/me", tags=['users'], response_model=User, response_model_exclude={"hash_password"})
-async def user_me(user: User = Depends(get_current_active_user)):
+@app.get("/users/me", tags=['users'], response_model=UserOut)
+async def user_me(user: FullUser = Depends(get_current_active_user)):
     return user
 
 
-@app.post("/users/register", tags=['users'], response_model=User, response_model_exclude={"hash_password"})
+@app.post("/users/register", tags=['users'], response_model=UserOut)
 async def register(user: UserRegister = Body(...)):
     return await UserModel.create(
         username=user.username,
@@ -46,5 +47,10 @@ async def register(user: UserRegister = Body(...)):
 
 
 @app.post("/items/create", tags=['items'], response_model=Item)
-async def create_item(item: ItemIn = Body(...), user: UserModel = Depends(get_current_active_user)):
+async def create_item(item: ItemIn = Body(...), user: FullUser = Depends(get_current_active_user)):
     return await ItemModel.create(**item.dict(), user_id=user.id)
+
+
+@app.get("/items", tags=['items'], response_model=List[Item])
+async def get_items(user: FullUser = Depends(get_current_active_user)):
+    return await ItemModel.filter(user_id=user.id)

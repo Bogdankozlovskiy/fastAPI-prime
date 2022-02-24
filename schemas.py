@@ -25,15 +25,26 @@ class Item(ItemIn):
         orm_mode = True
 
 
-class User(BaseModel):
+class BaseUser(BaseModel):
     username: str = Field(...)
     email: EmailStr = Field(...)
     full_name: str = Field(...)
     is_active: bool = Field(True)
-    hash_password: str = Field(...)
 
     class Config:
         orm_mode = True
+
+
+class User(BaseUser):
+    hash_password: str = Field(...)
+
+
+class UserOut(BaseUser):
+    id: int = Field(...)
+
+
+class FullUser(User, UserOut):
+    pass
 
 
 class UserRegister(BaseModel):

@@ -6,7 +6,7 @@ from jose import JWTError, jwt
 from datetime import datetime, timezone
 
 from settings import tokenUrl, ALGORITHM, SECRET_KEY
-from schemas import JWTToken, User
+from schemas import JWTToken, FullUser
 from models import User as UserModel
 
 
@@ -14,7 +14,7 @@ oauth2_passord_bearer = OAuth2PasswordBearer(tokenUrl=tokenUrl)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-async def get_user(token: str = Depends(oauth2_passord_bearer)) -> User:
+async def get_user(token: str = Depends(oauth2_passord_bearer)) -> FullUser:
     exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="user un authenticated",
@@ -30,10 +30,10 @@ async def get_user(token: str = Depends(oauth2_passord_bearer)) -> User:
     user = await UserModel.get(username=jwt_token.sub)
     if not user:
         raise exception
-    return user
+    return FullUser.from_orm(user)
 
 
-def get_current_active_user(user: User = Depends(get_user)):
+def get_current_active_user(user: FullUser = Depends(get_user)):
     if user.is_active:
         return user
     raise HTTPException(
