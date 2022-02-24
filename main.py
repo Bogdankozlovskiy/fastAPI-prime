@@ -3,15 +3,17 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from tortoise.contrib.fastapi import register_tortoise
 from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
+from starlette.middleware.base import BaseHTTPMiddleware
 
-from time import time
-from typing import Callable
+from middlewares import add_prcess_time_header
 from settings import TORTOISE_ORM, origins
-
 from routers import users_router, items_router
+
 
 app = FastAPI()
 
+app.include_router(users_router)
+app.include_router(items_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -20,18 +22,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(users_router)
-app.include_router(items_router)
-
-
-@app.middleware("http")
-async def add_prcess_time_header(request: Request, call_next: Callable):
-    start_time = time()
-    # request.state  in state we can add whanever we want, for exaple user, like request.state.user = user
-    respose = await call_next(request)
-    process_time = time() - start_time
-    respose.headers["X-Process-Time"] = str(process_time)
-    return respose
+app.add_middleware(BaseHTTPMiddleware, dispatch=add_prcess_time_header)
 
 
 register_tortoise(
