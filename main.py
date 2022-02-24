@@ -37,16 +37,12 @@ async def user_me(user: User = Depends(get_current_active_user)):
 
 @app.post("/users/register", tags=['users'], response_model=User, response_model_exclude={"hash_password"})
 async def register(user: UserRegister = Body(...)):
-    users = await UserModel.filter(username=user.username)
-    if users:
-        return {"error": "user with this username already exists"}
-    user = await UserModel.create(
+    return await UserModel.create(
         username=user.username,
         email=user.email,
         full_name=user.full_name,
         hash_password=pwd_context.hash(user.password._secret_value)
     )
-    return user
 
 
 @app.post("/items/create", tags=['items'], response_model=Item)
