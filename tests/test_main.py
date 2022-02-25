@@ -9,11 +9,17 @@ from main import test_app as app
 from settings import tokenUrl, TORTOISE_ORM_TEST
 from tests.shortcuts import Client
 
-user_data = {
+user_data_register = {
     "username": "testname",
     "email": "test@email.ru",
     "full_name": "full_name",
     "password": "password"
+}
+
+user_data_login = {
+    "username": "testname",
+    "password": "password",
+    "grant_type": "password"
 }
 
 
@@ -26,21 +32,21 @@ def client() -> Generator:
 
 
 def test_get_me(client: Client):
-    client.register("/users/register", user_data)
-    client.login(tokenUrl, user_data)
+    client.register("/users/register", user_data_register)
+    client.login(tokenUrl, {**user_data_login, **{"scope": "me"}})
 
     response = client.get("/users/me")
     assert response.status_code == status.HTTP_200_OK, response.json()
     retrieved_user_data = response.json()
-    assert user_data["username"] == retrieved_user_data["username"], "username is not the same"
-    assert user_data["email"] == retrieved_user_data["email"], "email is not the same"
-    assert user_data["full_name"] == retrieved_user_data["full_name"], "full_name is not the same"
+    assert user_data_register["username"] == retrieved_user_data["username"], "username is not the same"
+    assert user_data_register["email"] == retrieved_user_data["email"], "email is not the same"
+    assert user_data_register["full_name"] == retrieved_user_data["full_name"], "full_name is not the same"
     assert retrieved_user_data.get("id"), "id is not recived"
 
 
 def test_check_my_empty_items(client: Client):
-    client.register("/users/register", user_data)
-    client.login(tokenUrl, user_data)
+    client.register("/users/register", user_data_register)
+    client.login(tokenUrl, user_data_login)
 
     response = client.get("/items")
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -48,8 +54,8 @@ def test_check_my_empty_items(client: Client):
 
 
 def test_create_item(client: Client):
-    client.register("/users/register", user_data)
-    client.login(tokenUrl, user_data)
+    client.register("/users/register", user_data_register)
+    client.login(tokenUrl, user_data_login)
     # create item
     item_data = {
         "title": "test item title",

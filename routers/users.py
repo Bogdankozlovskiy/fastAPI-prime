@@ -1,12 +1,11 @@
-from fastapi import APIRouter, Depends, status, HTTPException, Body
+from fastapi import APIRouter, Depends, status, HTTPException, Body, Security
 from fastapi.security import OAuth2PasswordRequestForm
 
-
 from settings import tokenUrl, ALGORITHM, SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES
-from schemas import User, AccessToken, JWTToken, FullUser, UserOut, UserRegister
+from schemas import User, AccessToken, JWTToken, UserOut, UserRegister, UserWithScope
 from models import User as UserModel
 from utils import pwd_context
-from dependencies import get_current_active_user
+from dependencies import get_current_user_check_permissions
 
 from datetime import datetime, timedelta
 from jose import jwt
@@ -26,14 +25,15 @@ async def login(user: OAuth2PasswordRequestForm = Depends()):
         )
     jwt_token = JWTToken(
         sub=db_user_model.username,
-        exp=datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        exp=datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        scopes=user.scopes
     )
     token = jwt.encode(jwt_token.dict(), key=SECRET_KEY, algorithm=ALGORITHM)
     return {"access_token": token}
 
 
 @router.get("/users/me", tags=['users'], response_model=UserOut)
-async def user_me(user: FullUser = Depends(get_current_active_user)):
+async def user_me(user: UserWithScope = Security(get_current_user_check_permissions, scopes=["me"])):
     return user
 
 

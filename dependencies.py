@@ -58,8 +58,14 @@ async def get_current_active_user(
     )
 
 
-async def check_scope_permissions(
+async def get_current_user_check_permissions(
         security_scopes: SecurityScopes,
         user: UserWithScope = Depends(get_current_active_user)
 ) -> UserWithScope:
-    pass  # TODO add logic here
+    required_scopes = set(security_scopes.scopes)
+    if required_scopes.issubset(user.scopes):
+        return user
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="do not have permission for that action"
+    )
