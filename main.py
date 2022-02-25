@@ -11,7 +11,7 @@ from settings import TORTOISE_ORM_DEV, TORTOISE_ORM_TEST, origins
 from routers import users_router, items_router
 
 
-def build_app(env="dev"):
+def build_app(env):
     app = FastAPI()
     app.include_router(users_router)
     app.include_router(items_router)
@@ -33,5 +33,5 @@ def build_app(env="dev"):
     return app
 
 
-app = build_app()
+app = build_app("dev")
 test_app = build_app("test")
