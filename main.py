@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from tortoise.contrib.fastapi import register_tortoise
-from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from middlewares import add_prcess_time_header
@@ -27,7 +26,7 @@ def build_app(env):
     if env == "dev":
         register_tortoise(app, config=TORTOISE_ORM_DEV, add_exception_handlers=True)
     elif env == "test":
-        register_tortoise(app, config=TORTOISE_ORM_TEST, add_exception_handlers=True, generate_schemas=True)
+        register_tortoise(app, config=TORTOISE_ORM_TEST, add_exception_handlers=True)
     else:
         NotImplemented("this env is not supported yet")
     return app
