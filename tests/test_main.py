@@ -8,19 +8,7 @@ from pytest import fixture
 from main import test_app as app
 from settings import tokenUrl, TORTOISE_ORM_TEST
 from tests.shortcuts import Client
-
-user_data_register = {
-    "username": "testname",
-    "email": "test@email.ru",
-    "full_name": "full_name",
-    "password": "password"
-}
-
-user_data_login = {
-    "username": "testname",
-    "password": "password",
-    "grant_type": "password"
-}
+from tests.example_data import user_data_login, user_data_register
 
 
 @fixture
@@ -46,7 +34,7 @@ def test_get_me(client: Client):
 
 def test_check_my_empty_items(client: Client):
     client.register("/users/register", user_data_register)
-    client.login(tokenUrl, user_data_login)
+    client.login(tokenUrl, {**user_data_login, **{"scope": "items.read"}})
 
     response = client.get("/items")
     assert response.status_code == status.HTTP_200_OK, response.json()
@@ -55,7 +43,7 @@ def test_check_my_empty_items(client: Client):
 
 def test_create_item(client: Client):
     client.register("/users/register", user_data_register)
-    client.login(tokenUrl, user_data_login)
+    client.login(tokenUrl, {**user_data_login, **{"scope": "items.read items.write"}})
     # create item
     item_data = {
         "title": "test item title",

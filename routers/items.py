@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Body, Depends, status, Response
+from fastapi import APIRouter, Body, status, Response, Security
 
 from schemas import ItemIn, Item, FullUser
 from models import Item as ItemModel
-from dependencies import get_current_active_user
+from dependencies import get_current_user_check_permissions
 
 from typing import List
 
@@ -26,7 +26,10 @@ router = APIRouter(
         }
     }
 )
-async def create_item(item: ItemIn = Body(...), user: FullUser = Depends(get_current_active_user)):
+async def create_item(
+        item: ItemIn = Body(...),
+        user: FullUser = Security(get_current_user_check_permissions, scopes=['items.write'])
+):
     return await ItemModel.create(**item.dict(), user_id=user.id)
 
 
@@ -44,7 +47,10 @@ async def create_item(item: ItemIn = Body(...), user: FullUser = Depends(get_cur
         }
     }
 )
-async def get_items(response: Response, user: FullUser = Depends(get_current_active_user)):
+async def get_items(
+        response: Response,
+        user: FullUser = Security(get_current_user_check_permissions, scopes=["items.read"])
+):
     """
     get all items that belongs to current user:
 
