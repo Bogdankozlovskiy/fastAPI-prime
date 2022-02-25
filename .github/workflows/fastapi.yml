@@ -26,4 +26,5 @@ jobs:
     - name: Run Tests
       run: |
         echo pwd
+        echo ls
         python -m poetry run pytest
