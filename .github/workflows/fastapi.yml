@@ -25,6 +25,4 @@ jobs:
         python -m poetry update
     - name: Run Tests
       run: |
-        pwd
-        ls
-        python -m poetry run pytest
+        python -m poetry run python -m pytest
