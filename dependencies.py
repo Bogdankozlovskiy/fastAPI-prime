@@ -1,17 +1,19 @@
 from fastapi import Depends, HTTPException, status, BackgroundTasks, Query
-from fastapi.security import OAuth2PasswordBearer, SecurityScopes
+from fastapi.security import OAuth2PasswordBearer, SecurityScopes, HTTPBasic, HTTPBasicCredentials
 
 from jose import JWTError, jwt
 from datetime import datetime, timezone
 from pydantic import ValidationError
+from typing import Optional
 
 from models import User as UserModel
 from schemas import JWTToken, UserWithScope, FullUser
 from settings import tokenUrl, ALGORITHM, SECRET_KEY, scopes
-from utils import hello_world
+from utils import hello_world, pwd_context
 
 
-oauth2_passord_bearer = OAuth2PasswordBearer(tokenUrl=tokenUrl, scopes=scopes)
+oauth2_passord_bearer = OAuth2PasswordBearer(tokenUrl=tokenUrl, scopes=scopes, auto_error=False)
+security = HTTPBasic(auto_error=False)
 
 
 class CustomDepends:
@@ -22,8 +24,32 @@ class CustomDepends:
         return q is not None and self.magick_word in q
 
 
-async def get_user(token: str = Depends(oauth2_passord_bearer)) -> UserWithScope:
+async def get_user(
+        token: Optional[str] = Depends(oauth2_passord_bearer),
+        credentials: Optional[HTTPBasicCredentials] = Depends(security)
+) -> UserWithScope:
     headers = {"WWW-Authenticate": "Bearer"}
+    if token is None and credentials is None:
+        raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not authenticated",
+                headers=headers
+            )
+    if credentials is not None:
+        user = await UserModel.get(username=credentials.username)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="user is not defined",
+                headers=headers
+            )
+        if not pwd_context.verify(credentials.password, user.hash_password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="uncorrect username or password",
+                headers=headers
+            )
+        return UserWithScope(**FullUser.from_orm(user).dict(), scopes=list(scopes.keys()))
     try:
         payload = jwt.decode(token, key=SECRET_KEY, algorithms=ALGORITHM)
         jwt_token = JWTToken.parse_obj(payload)

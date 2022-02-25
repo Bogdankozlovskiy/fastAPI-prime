@@ -17,11 +17,11 @@ router = APIRouter()
 async def login(user: OAuth2PasswordRequestForm = Depends()):
     db_user = await UserModel.get(username=user.username)
     db_user_model = User.from_orm(db_user)
-    hashed_password = pwd_context.hash(user.password)
-    if pwd_context.verify(db_user_model.hash_password, hashed_password):
+    if not pwd_context.verify(user.password, db_user_model.hash_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="uncorrect username or password"
+            detail="uncorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"}
         )
     jwt_token = JWTToken(
         sub=db_user_model.username,
