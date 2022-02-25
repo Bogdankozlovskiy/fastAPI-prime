@@ -1,16 +1,13 @@
-from fastapi.testclient import TestClient
-from fastapi import status
-from tortoise.contrib.test import finalizer, initializer
-
 from os import remove
-from pytest import fixture
 from typing import Generator
-from settings import TORTOISE_ORM_TEST
+
+from fastapi import status
+from fastapi.testclient import TestClient
+from pytest import fixture
 
 from main import test_app as app
-from settings import tokenUrl
+from settings import tokenUrl, TORTOISE_ORM_TEST
 from tests.shortcuts import Client
-
 
 user_data = {
     "username": "testname",
