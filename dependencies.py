@@ -1,9 +1,9 @@
-from fastapi import Depends, HTTPException, status, BackgroundTasks
+from fastapi import Depends, HTTPException, status, BackgroundTasks, Query
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 
 from jose import JWTError, jwt
 from datetime import datetime, timezone
-from fastapi import Query
+from pydantic import ValidationError
 
 from models import User as UserModel
 from schemas import JWTToken, UserWithScope, FullUser
@@ -23,21 +23,29 @@ class CustomDepends:
 
 
 async def get_user(token: str = Depends(oauth2_passord_bearer)) -> UserWithScope:
-    exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="user un authenticated",
-        headers={"WWW-Authenticate": "Bearer"}
-    )
+    headers = {"WWW-Authenticate": "Bearer"}
     try:
         payload = jwt.decode(token, key=SECRET_KEY, algorithms=ALGORITHM)
-    except JWTError:
-        raise exception
-    jwt_token = JWTToken.parse_obj(payload)
+        jwt_token = JWTToken.parse_obj(payload)
+    except (JWTError, ValidationError) as error:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(error),
+            headers=headers
+        )
     if jwt_token.exp < datetime.now(tz=timezone.utc):
-        raise exception
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="token was expired",
+            headers=headers
+        )
     user = await UserModel.get(username=jwt_token.sub)
     if not user:
-        raise exception
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="user is not defined",
+            headers=headers
+        )
     return UserWithScope(**FullUser.from_orm(user).dict(), scopes=jwt_token.scopes)
 
 
@@ -67,5 +75,6 @@ async def get_current_user_check_permissions(
         return user
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
-        detail="do not have permission for that action"
+        detail="you do not have permission for that action",
+        headers={"WWW-Authenticate": f"Bearer scopes={security_scopes.scope_str}"}
     )
