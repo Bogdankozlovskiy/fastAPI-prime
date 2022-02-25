@@ -37,6 +37,7 @@ async def get_user(
             )
     if credentials is not None:
         user = await UserModel.get(username=credentials.username)
+        headers = {"WWW-Authenticate": "Basic"}
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -45,7 +46,7 @@ async def get_user(
             )
         if not pwd_context.verify(credentials.password, user.hash_password):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="uncorrect username or password",
                 headers=headers
             )
