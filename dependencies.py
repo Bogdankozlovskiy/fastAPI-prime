@@ -75,6 +75,6 @@ async def get_current_user_check_permissions(
         return user
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
-        detail="you do not have permission for that action",
+        detail="you don't have enough permissions for this action",
         headers={"WWW-Authenticate": f"Bearer scopes={security_scopes.scope_str}"}
     )
