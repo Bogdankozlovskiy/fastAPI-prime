@@ -1,9 +1,9 @@
-from os import remove
-from typing import Generator
-
 from fastapi import status
 from fastapi.testclient import TestClient
+
+from typing import Generator
 from pytest import fixture
+from tortoise.contrib.test import finalizer, initializer
 
 from main import test_app as app
 from settings import tokenUrl, TORTOISE_ORM_TEST
@@ -13,10 +13,13 @@ from tests.example_data import user_data_login, user_data_register
 
 @fixture
 def client() -> Generator:
-    _, db_name = TORTOISE_ORM_TEST['connections']['default'].split("//")
+    initializer(
+        TORTOISE_ORM_TEST['apps']['models']['models'],
+        TORTOISE_ORM_TEST['connections']['default']
+    )
     with TestClient(app) as client:
         yield Client(client)
-    remove(db_name)
+    finalizer()
 
 
 def test_get_me(client: Client):
