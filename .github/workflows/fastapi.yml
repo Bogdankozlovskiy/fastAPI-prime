@@ -25,4 +25,5 @@ jobs:
         python -m poetry update
     - name: Run Tests
       run: |
+        echo pwd
         python -m poetry run pytest
