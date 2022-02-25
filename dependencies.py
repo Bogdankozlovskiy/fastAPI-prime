@@ -1,12 +1,12 @@
 from fastapi import Depends, HTTPException, status, BackgroundTasks
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 
 from jose import JWTError, jwt
 from datetime import datetime, timezone
 from fastapi import Query
 
 from models import User as UserModel
-from schemas import JWTToken, FullUser
+from schemas import JWTToken, UserWithScope, FullUser
 from settings import tokenUrl, ALGORITHM, SECRET_KEY, scopes
 from utils import hello_world
 
@@ -22,7 +22,7 @@ class CustomDepends:
         return q is not None and self.magick_word in q
 
 
-async def get_user(token: str = Depends(oauth2_passord_bearer)) -> FullUser:
+async def get_user(token: str = Depends(oauth2_passord_bearer)) -> UserWithScope:
     exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="user un authenticated",
@@ -38,14 +38,14 @@ async def get_user(token: str = Depends(oauth2_passord_bearer)) -> FullUser:
     user = await UserModel.get(username=jwt_token.sub)
     if not user:
         raise exception
-    return FullUser.from_orm(user)
+    return UserWithScope(**FullUser.from_orm(user).dict(), scopes=jwt_token.scopes)
 
 
 async def get_current_active_user(
         task: BackgroundTasks,
-        user: FullUser = Depends(get_user),
+        user: UserWithScope = Depends(get_user),
         is_query_contain_wisky: bool = Depends(CustomDepends(magick_word="wisky"))
-):
+) -> UserWithScope:
     task.add_task(hello_world, msg=user.username)
     if is_query_contain_wisky:
         print(f"{is_query_contain_wisky=}")
@@ -56,3 +56,10 @@ async def get_current_active_user(
         detail="user in unnactive now",
         headers={"WWW-Authenticate": "Bearer"}
     )
+
+
+async def check_scope_permissions(
+        security_scopes: SecurityScopes,
+        user: UserWithScope = Depends(get_current_active_user)
+) -> UserWithScope:
+    pass  # TODO add logic here

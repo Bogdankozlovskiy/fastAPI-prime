@@ -1,10 +1,12 @@
 from pydantic import BaseModel, Field, EmailStr, SecretStr
 from datetime import datetime
+from typing import List
 
 
 class JWTToken(BaseModel):
     sub: str = Field(...)
     exp: datetime = Field(...)
+    scopes: List[str] = Field(default_factory=list)
 
 
 class AccessToken(BaseModel):
@@ -45,6 +47,10 @@ class UserOut(BaseUser):
 
 class FullUser(User, UserOut):
     pass
+
+
+class UserWithScope(FullUser):
+    scopes: List[str] = Field(default_factory=list)
 
 
 class UserRegister(BaseModel):
