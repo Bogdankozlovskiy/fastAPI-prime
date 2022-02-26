@@ -4,6 +4,7 @@ from strawberry.fastapi import GraphQLRouter
 
 @strawberry.type
 class Query:
+    #  https://strawberry.rocks/docs/integrations/fastapi
     @strawberry.field
     async def hello(self) -> str:
         return "Hello World"
