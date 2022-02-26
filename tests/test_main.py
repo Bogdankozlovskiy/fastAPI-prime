@@ -2,7 +2,7 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from typing import Generator
-from pytest import fixture
+import pytest
 from tortoise.contrib.test import finalizer, initializer
 
 from main import test_app as app
@@ -11,7 +11,7 @@ from tests.shortcuts import Client
 from tests.example_data import user_data_login, user_data_register
 
 
-@fixture
+@pytest.fixture
 def client() -> Generator:
     initializer(
         TORTOISE_ORM_TEST['apps']['models']['models'],
