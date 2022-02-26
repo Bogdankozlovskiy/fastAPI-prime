@@ -1,12 +1,14 @@
 from fastapi import status
+from dataclasses import dataclass, field
 from httpx import AsyncClient
 from functools import wraps
+from typing import Optional, Dict
 
 
+@dataclass
 class Client:
-    def __init__(self, client: AsyncClient):
-        self.client = client
-        self.headers = None
+    client: AsyncClient
+    headers: Optional[Dict] = field(default=None)
 
     async def register(self, register_url: str, user_data: dict):
         response = await self.client.post(
