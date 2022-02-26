@@ -10,3 +10,8 @@ user_data_login = {
     "password": "password",
     "grant_type": "password"
 }
+
+item_data = {
+    "title": "test item title",
+    "date_created": "2022-02-24T14:12:49.047Z"
+}
