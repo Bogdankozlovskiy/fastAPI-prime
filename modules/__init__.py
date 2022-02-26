@@ -1,5 +1,5 @@
 from modules.items.handlers import router as items_router
-from modules.web_socket.handlers import router as users_router
+from modules.users.handlers import router as users_router
 from modules.pages.handlers import router as page_router
 from modules.graph_ql.handlers import graphql_app as graph_ql_router
 from modules.events.handlers import router as events_router
