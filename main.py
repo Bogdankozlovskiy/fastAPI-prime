@@ -7,7 +7,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from middlewares import add_prcess_time_header
 from settings import TORTOISE_ORM_DEV, TORTOISE_ORM_TEST, origins
-from routers import users_router, items_router, page_router
+from routers import users_router, items_router, page_router, graph_ql_router
 
 
 def build_app(env):
@@ -15,6 +15,7 @@ def build_app(env):
     app.include_router(users_router)
     app.include_router(items_router)
     app.include_router(page_router)
+    app.include_router(graph_ql_router, include_in_schema=False, prefix="/graphql")
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,

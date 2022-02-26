@@ -24,7 +24,7 @@ async def test_get_me(client):
 
 @pytest.mark.asyncio
 async def test_check_my_empty_items(client):
-    await client.login(tokenUrl, {**user_data_login, **{"scope": "items.read"}})
+    await client.login(tokenUrl, {**user_data_login, "scope": "items.read"})
     response = await client.get("/items/")
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json() == []
@@ -32,7 +32,7 @@ async def test_check_my_empty_items(client):
 
 @pytest.mark.asyncio
 async def test_create_item(client):
-    await client.login(tokenUrl, {**user_data_login, **{"scope": "items.write"}})
+    await client.login(tokenUrl, {**user_data_login, "scope": "items.write"})
     response = await client.post(
         "/items/create",
         json=item_data
@@ -42,7 +42,15 @@ async def test_create_item(client):
 
 @pytest.mark.asyncio
 async def test_check_my_items(client):
-    await client.login(tokenUrl, {**user_data_login, **{"scope": "items.read"}})
+    await client.login(tokenUrl, {**user_data_login, "scope": "items.read"})
     response = await client.get("/items/")
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json(), "no items"
+
+
+@pytest.mark.asyncio
+async def test_graph_ql(client):
+    await client.login(tokenUrl, user_data_login)
+    response = await client.post("/graphql", json={"query": "query{world(x:2)}", "variables": None})
+    assert response.status_code == status.HTTP_200_OK, response.json()
+    assert response.json(), "empty response"
