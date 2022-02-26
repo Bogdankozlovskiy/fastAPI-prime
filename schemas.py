@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, EmailStr, SecretStr
 from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
+from pydantic.utils import GetterDict
 from datetime import datetime
 from typing import List
 
