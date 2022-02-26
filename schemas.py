@@ -84,4 +84,4 @@ class UserRegister(BaseModel):
     password: SecretStr = Field(...)
 
 
-ItemOutWithUser.update_forward_refs()
+ItemOutWithUser.update_forward_refs()  # we need to call this mecause in ItemOutWithUser we used postponed annotation
