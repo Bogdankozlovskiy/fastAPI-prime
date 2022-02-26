@@ -58,7 +58,10 @@ async def test_graph_ql(client):
 
 def test_web_socket(client):
     data = "{\"hello\":\"world\"}"
-    with client.websocket_connect("/web_socket") as web_socket:
-        web_socket.send_json(data)
-        recived_data = web_socket.receive_json()
-        assert data == recived_data, "request and response are not the same"
+    with client.websocket_connect("/web_socket") as web_socket_1, \
+            client.websocket_connect("/web_socket") as web_socket_2:
+        web_socket_1.send_json(data)
+        recived_data_1 = web_socket_1.receive_json()
+        recived_data_2 = web_socket_2.receive_json()
+        assert data == recived_data_1, "request and response are not the same"
+        assert recived_data_1 == recived_data_2, "client rcived not the same data"
