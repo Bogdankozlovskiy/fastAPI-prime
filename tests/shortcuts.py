@@ -3,12 +3,16 @@ from dataclasses import dataclass, field
 from httpx import AsyncClient
 from functools import wraps
 from typing import Optional, Dict
+from fastapi.testclient import TestClient
 
 
 @dataclass
 class Client:
     client: AsyncClient
     headers: Optional[Dict] = field(default=None)
+
+    def __post_init__(self):
+        self._test_client = TestClient(self.client._transport.app)
 
     async def register(self, register_url: str, user_data: dict):
         response = await self.client.post(
@@ -33,6 +37,8 @@ class Client:
         self.headers = None
 
     def __getattr__(self, attr: str):
+        if attr == "websocket_connect":
+            return self._test_client.websocket_connect
         func = getattr(self.client, attr)
         assert callable(func), "it is not calleble option"
 

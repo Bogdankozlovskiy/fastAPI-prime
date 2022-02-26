@@ -54,3 +54,11 @@ async def test_graph_ql(client):
     response = await client.post("/graphql", json={"query": "query{world(x:2)}", "variables": None})
     assert response.status_code == status.HTTP_200_OK, response.json()
     assert response.json(), "empty response"
+
+
+def test_web_socket(client):
+    data = "{\"hello\":\"world\"}"
+    with client.websocket_connect("/web_socket") as web_socket:
+        web_socket.send_json(data)
+        recived_data = web_socket.receive_json()
+        assert data == recived_data, "request and response are not the same"
