@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Body, status, Response, Security
 
-from schemas import ItemIn, Item, FullUser
+from schemas import ItemIn, Item, ItemOutWithUser, FullUser
 from models import Item as ItemModel
 from dependencies import get_current_user_check_permissions
 
@@ -35,7 +35,7 @@ async def create_item(
 
 @router.get(
     "/",
-    response_model=List[Item],
+    response_model=List[ItemOutWithUser],
     operation_id="test_id",
     openapi_extra={"x-aperture-labs-portal": "blue"},
     responses={
@@ -65,4 +65,5 @@ async def get_items(
     response.set_cookie(key="sessionId", value="sessionValue")
     response.headers['test_header_key'] = "test header value"
     # response.status_code we also can set custom status code if we want
-    return await ItemModel.filter(user_id=user.id)
+    result = await ItemModel.filter(user_id=user.id).select_related("user")
+    return result

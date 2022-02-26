@@ -1,8 +1,19 @@
-from pydantic import BaseModel, Field, EmailStr, SecretStr
 from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
+from tortoise.fields.relational import ReverseRelation
+
+from pydantic import BaseModel, Field, EmailStr, SecretStr
 from pydantic.utils import GetterDict
+
 from datetime import datetime
-from typing import List
+from typing import List, Any
+
+
+class TortoiseGetterDict(GetterDict):
+    def get(self, key: Any, default: Any = None):
+        res = getattr(self._obj, key, default)
+        if isinstance(res, ReverseRelation):
+            return res.related_objects
+        return res
 
 
 class JWTToken(BaseModel):
@@ -29,6 +40,10 @@ class Item(ItemIn):
         orm_mode = True
 
 
+class ItemOutWithUser(Item):
+    user: "UserOut" = Field(...)
+
+
 class BaseUser(BaseModel):
     username: str = Field(...)
     email: EmailStr = Field(...)
@@ -47,6 +62,13 @@ class UserOut(BaseUser):
     id: int = Field(...)
 
 
+class UserOutWithItems(UserOut):
+    items: List[Item] = Field(...)
+
+    class Config(UserOut.Config):
+        getter_dict = TortoiseGetterDict
+
+
 class FullUser(User, UserOut):
     pass
 
@@ -60,3 +82,6 @@ class UserRegister(BaseModel):
     email: EmailStr = Field(...)
     full_name: str = Field(...)
     password: SecretStr = Field(...)
+
+
+ItemOutWithUser.update_forward_refs()

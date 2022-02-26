@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, HTTPException, Body, Security
 from fastapi.security import OAuth2PasswordRequestForm
 
 from settings import tokenUrl, ALGORITHM, SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES
-from schemas import User, AccessToken, JWTToken, UserOut, UserRegister, UserWithScope
+from schemas import User, AccessToken, JWTToken, UserOut, UserRegister, UserWithScope, UserOutWithItems
 from models import User as UserModel
 from utils import pwd_context
 from dependencies import get_current_user_check_permissions
@@ -32,9 +32,9 @@ async def login(user: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": token}
 
 
-@router.get("/users/me", tags=['users'], response_model=UserOut)
+@router.get("/users/me", tags=['users'], response_model=UserOutWithItems)
 async def user_me(user: UserWithScope = Security(get_current_user_check_permissions, scopes=["me"])):
-    return user
+    return await UserModel.filter(id=user.id).prefetch_related("items").first()
 
 
 @router.post("/users/register", tags=['users'], response_model=UserOut, status_code=status.HTTP_201_CREATED)
