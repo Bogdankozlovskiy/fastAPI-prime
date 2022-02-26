@@ -1,22 +1,22 @@
 from fastapi import status
-from fastapi.testclient import TestClient
+from httpx import AsyncClient
 from functools import wraps
 
 
 class Client:
-    def __init__(self, client: TestClient):
+    def __init__(self, client: AsyncClient):
         self.client = client
         self.headers = None
 
-    def register(self, register_url: str, user_data: dict):
-        response = self.client.post(
+    async def register(self, register_url: str, user_data: dict):
+        response = await self.client.post(
             url=register_url,
             json=user_data
         )
         assert response.status_code == status.HTTP_201_CREATED, response.json()
 
-    def login(self, login_url: str, user_data: dict):
-        response = self.client.post(
+    async def login(self, login_url: str, user_data: dict):
+        response = await self.client.post(
             url=login_url,
             data=user_data
         )

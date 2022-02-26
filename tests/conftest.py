@@ -1,19 +1,26 @@
+import pytest_asyncio
 import pytest
-from fastapi.testclient import TestClient
-from typing import Generator
-from tortoise.contrib.test import finalizer, initializer
 
-from main import test_app as app
+import asyncio
+from tortoise import Tortoise
 from settings import TORTOISE_ORM_TEST
-from tests.shortcuts import Client
 
 
-@pytest.fixture
-def client() -> Generator:
-    initializer(
-        TORTOISE_ORM_TEST['apps']['models']['models'],
-        TORTOISE_ORM_TEST['connections']['default']
+# function: the default scope, the fixture is destroyed at the end of the test.
+# class: the fixture is destroyed during teardown of the last test in the class.
+# module: the fixture is destroyed during teardown of the last test in the module.
+# package: the fixture is destroyed during teardown of the last test in the package.
+# session: the fixture is destroyed at the end of the test session.
+@pytest_asyncio.fixture(scope="module", autouse=True)
+async def init():
+    await Tortoise.init(
+        config=TORTOISE_ORM_TEST
     )
-    with TestClient(app) as client:
-        yield Client(client)
-    finalizer()
+    await Tortoise.generate_schemas()
+    yield
+    await Tortoise._drop_databases()
+
+
+@pytest.fixture(scope="module")
+def event_loop():
+    return asyncio.get_event_loop()
