@@ -16,9 +16,7 @@ from tests.shortcuts import Client
 # session: the fixture is destroyed at the end of the test session.
 @pytest_asyncio.fixture(scope="module", autouse=True)
 async def init():
-    await Tortoise.init(
-        config=TORTOISE_ORM_TEST
-    )
+    await Tortoise.init(config=TORTOISE_ORM_TEST)
     await Tortoise.generate_schemas()
     yield
     await Tortoise._drop_databases()
