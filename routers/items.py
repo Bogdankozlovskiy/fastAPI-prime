@@ -65,5 +65,4 @@ async def get_items(
     response.set_cookie(key="sessionId", value="sessionValue")
     response.headers['test_header_key'] = "test header value"
     # response.status_code we also can set custom status code if we want
-    result = await ItemModel.filter(user_id=user.id).select_related("user")
-    return result
+    return await ItemModel.filter(user_id=user.id).select_related("user")
