@@ -17,6 +17,8 @@ jose = "^1.0.0"
 tortoise-orm = {extras = ["asyncpg"], version = "^0.18.1"}
 aerich = "^0.6.2"
 requests = "^2.27.1"
+httpx = "^0.22.0"
+pytest-asyncio = "^0.18.1"
 
 [tool.poetry.dev-dependencies]
 
