@@ -29,7 +29,7 @@ class Client:
             "Authorization": f"{token_type.title()} {access_token}"
         }
 
-    def logout(self):
+    async def logout(self):
         self.headers = None
 
     def __getattr__(self, attr: str):
