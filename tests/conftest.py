@@ -9,6 +9,8 @@ from main import test_app
 from tests.shortcuts import Client
 
 
+# test_app.dependency_overrides[]  use this tool for overriding dependency
+
 # function: the default scope, the fixture is destroyed at the end of the test.
 # class: the fixture is destroyed during teardown of the last test in the class.
 # module: the fixture is destroyed during teardown of the last test in the module.
