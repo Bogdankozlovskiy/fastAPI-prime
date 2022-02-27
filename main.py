@@ -7,17 +7,18 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from middlewares import add_prcess_time_header
 from settings import TORTOISE_ORM_DEV, TORTOISE_ORM_TEST, origins
-from modules import users_router, items_router, page_router, graph_ql_router, events_router, web_socket_router
+import modules
 
 
 def build_app(env):
     app = FastAPI()
-    app.include_router(users_router)
-    app.include_router(items_router)
-    app.include_router(page_router)
-    app.include_router(graph_ql_router, include_in_schema=False, prefix="/graphql")
-    app.include_router(events_router)
-    app.include_router(web_socket_router)
+    app.include_router(modules.users_router)
+    app.include_router(modules.items_router)
+    app.include_router(modules.page_router)
+    app.include_router(modules.graph_ql_router, include_in_schema=False, prefix="/graphql")
+    app.include_router(modules.events_router)
+    app.include_router(modules.web_socket_router)
+    app.include_router(modules.call_backcs_router)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
