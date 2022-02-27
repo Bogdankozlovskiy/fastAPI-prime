@@ -1,19 +1,8 @@
 from tortoise.contrib.pydantic import pydantic_model_creator, pydantic_queryset_creator
-from tortoise.fields.relational import ReverseRelation
-
 from pydantic import BaseModel, Field, EmailStr, SecretStr
-from pydantic.utils import GetterDict
-
 from datetime import datetime
-from typing import List, Any
-
-
-class TortoiseGetterDict(GetterDict):
-    def get(self, key: Any, default: Any = None):
-        res = getattr(self._obj, key, default)
-        if isinstance(res, ReverseRelation):
-            return res.related_objects
-        return res
+from typing import List
+from utils import TortoiseGetterDict
 
 
 class JWTToken(BaseModel):
