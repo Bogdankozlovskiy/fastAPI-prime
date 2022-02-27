@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field, EmailStr, SecretStr
 from datetime import datetime
 from typing import List
 from utils import TortoiseGetterDict
+from models import User as UserModel, Item as ItemModel
 
 
 class JWTToken(BaseModel):
@@ -16,39 +17,18 @@ class AccessToken(BaseModel):
     access_token: str = Field(...)
 
 
-class ItemIn(BaseModel):
-    title: str = Field(...)
-    date_created: datetime = Field(...)
-
-
-class Item(ItemIn):
-    id: int = Field(...)
-    user_id: int = Field(...)
-
-    class Config:
-        orm_mode = True
+ItemIn = pydantic_model_creator(ItemModel, name="ItemIn", include=("title", "date_created"))
+Item = pydantic_model_creator(ItemModel, name="Item", include=("id", "user_id", "title", "date_created"))
 
 
 class ItemOutWithUser(Item):
     user: "UserOut" = Field(...)
 
 
-class BaseUser(BaseModel):
-    username: str = Field(...)
-    email: EmailStr = Field(...)
-    full_name: str = Field(...)
-    is_active: bool = Field(True)
-
-    class Config:
-        orm_mode = True
-
-
-class User(BaseUser):
-    hash_password: str = Field(...)
-
-
-class UserOut(BaseUser):
-    id: int = Field(...)
+BaseUser = pydantic_model_creator(UserModel, name="BaseUser", include=("username", "email", "full_name", "is_active"))
+User = pydantic_model_creator(UserModel, name="User", exclude=("id", ))
+UserOut = pydantic_model_creator(UserModel, name="UserOut", exclude=("hash_password",))
+FullUser = pydantic_model_creator(UserModel, name="FullUser")
 
 
 class UserOutWithItems(UserOut):
@@ -56,10 +36,6 @@ class UserOutWithItems(UserOut):
 
     class Config(UserOut.Config):
         getter_dict = TortoiseGetterDict
-
-
-class FullUser(User, UserOut):
-    pass
 
 
 class UserWithScope(FullUser):
