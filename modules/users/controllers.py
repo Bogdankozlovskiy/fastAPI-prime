@@ -15,14 +15,17 @@ router = APIRouter()
 
 @router.post(tokenUrl, include_in_schema=False, response_model=AccessToken)
 async def login(user: OAuth2PasswordRequestForm = Depends()):
-    db_user = await UserModel.get(username=user.username)
+    exception = HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="uncorrect username or password",
+        headers={"WWW-Authenticate": "Bearer"}
+    )
+    db_user = await UserModel.get_or_none(username=user.username)
+    if db_user is None:
+        raise exception
     db_user_model = await User.from_tortoise_orm(db_user)
     if not pwd_context.verify(user.password, db_user_model.hash_password):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="uncorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"}
-        )
+        raise exception
     jwt_token = JWTToken(
         sub=db_user_model.username,
         exp=datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
