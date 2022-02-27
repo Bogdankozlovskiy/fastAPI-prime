@@ -1,5 +1,5 @@
 from passlib.context import CryptContext
-from typing import Union, Any
+from typing import Optional, Any
 from pydantic.utils import GetterDict
 from tortoise.fields.relational import ReverseRelation
 
@@ -7,7 +7,7 @@ from tortoise.fields.relational import ReverseRelation
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-async def hello_world(msg: Union[str, None] = None) -> None:
+async def hello_world(msg: Optional[str] = None) -> None:
     print(f"hello {msg}")
 
 

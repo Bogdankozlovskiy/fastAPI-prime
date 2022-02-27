@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, status, HTTPException, Body, Security
 from fastapi.security import OAuth2PasswordRequestForm
 
 from settings import tokenUrl, ALGORITHM, SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES
-from schemas import User, AccessToken, JWTToken, UserOut, UserRegister, UserWithScope, UserOutWithItems
-from models import User as UserModel
+from modules.users.schemas import User, AccessToken, JWTToken, UserOut, UserRegister, UserWithScope, UserOutWithItems
+from modules.users.models import User as UserModel
 from utils import pwd_context
 from dependencies import get_current_user_check_permissions
 
@@ -16,7 +16,7 @@ router = APIRouter()
 @router.post(tokenUrl, include_in_schema=False, response_model=AccessToken)
 async def login(user: OAuth2PasswordRequestForm = Depends()):
     db_user = await UserModel.get(username=user.username)
-    db_user_model = User.from_orm(db_user)
+    db_user_model = await User.from_tortoise_orm(db_user)
     if not pwd_context.verify(user.password, db_user_model.hash_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

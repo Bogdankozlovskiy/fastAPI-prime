@@ -1,16 +1,14 @@
 from fastapi import APIRouter, Body, status, Response, Security
 
-from schemas import ItemIn, Item, ItemOutWithUser, FullUser
-from models import Item as ItemModel
+from modules.items.schemas import ItemIn, Item, ItemOutWithUser
+from modules.users.schemas import FullUser
+from modules.items.models import Item as ItemModel
 from dependencies import get_current_user_check_permissions
 
 from typing import List
 
 
-router = APIRouter(
-    prefix="/items",
-    tags=['items']
-)
+router = APIRouter(prefix="/items", tags=['items'])
 
 
 @router.post(

@@ -6,8 +6,8 @@ from datetime import datetime, timezone
 from pydantic import ValidationError
 from typing import Optional
 
-from models import User as UserModel
-from schemas import JWTToken, UserWithScope, FullUser
+from modules.users.models import User as UserModel
+from modules.users.schemas import UserWithScope, FullUser, JWTToken
 from settings import tokenUrl, ALGORITHM, SECRET_KEY, scopes
 from utils import hello_world, pwd_context
 
@@ -50,7 +50,8 @@ async def get_user(
                 detail="uncorrect username or password",
                 headers=headers
             )
-        return UserWithScope(**FullUser.from_orm(user).dict(), scopes=list(scopes.keys()))
+        data = await FullUser.from_tortoise_orm(user)
+        return UserWithScope(**data.dict(), scopes=list(scopes.keys()))
     try:
         payload = jwt.decode(token, key=SECRET_KEY, algorithms=ALGORITHM)
         jwt_token = JWTToken.parse_obj(payload)
@@ -73,7 +74,8 @@ async def get_user(
             detail="user is not defined",
             headers=headers
         )
-    return UserWithScope(**FullUser.from_orm(user).dict(), scopes=jwt_token.scopes)
+    data = await FullUser.from_tortoise_orm(user)
+    return UserWithScope(**data.dict(), scopes=jwt_token.scopes)
 
 
 async def get_current_active_user(

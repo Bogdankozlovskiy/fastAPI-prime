@@ -18,10 +18,3 @@ class User(Model):
     is_active = fields.BooleanField(default=True)
     date_created = fields.DatetimeField(auto_now_add=True)
     date_update = fields.DatetimeField(auto_now=True)
-
-
-class Item(Model):
-    title = fields.CharField(max_length=150)
-    # number = fields.IntField(default=0)
-    date_created = fields.DatetimeField(auto_now_add=True)
-    user = fields.ForeignKeyField("models.User", related_name="items")

@@ -13,7 +13,7 @@ TORTOISE_ORM_DEV = {
     "connections": {"default": "postgres://peewee_user:1234@localhost:5432/peewee_db"},
     "apps": {
         "models": {
-            "models": ["models", "aerich.models"],
+            "models": ["modules.users.models", "modules.items.models", "aerich.models"],
             "default_connection": "default"
         }
     }
@@ -22,7 +22,7 @@ TORTOISE_ORM_TEST = {
     "connections": {"default": "sqlite://db.sqlite3"},
     "apps": {
         "models": {
-            "models": ["models", "aerich.models"],
+            "models": ["modules.users.models", "modules.items.models", "aerich.models"],
             "default_connection": "default"
         }
     }

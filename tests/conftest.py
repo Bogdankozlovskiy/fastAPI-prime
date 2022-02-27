@@ -20,8 +20,12 @@ from tests.shortcuts import Client
 async def init():
     await Tortoise.init(config=TORTOISE_ORM_TEST)
     await Tortoise.generate_schemas()
-    yield
-    await Tortoise._drop_databases()
+    try:
+        yield
+    except:
+        pass
+    finally:
+        await Tortoise._drop_databases()
 
 
 @pytest.fixture(scope="module")
