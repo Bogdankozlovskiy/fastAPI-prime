@@ -12,7 +12,7 @@ async def hello_world(msg: Optional[str] = None) -> None:
 
 
 class TortoiseGetterDict(GetterDict):
-    def get(self, key: Any, default: Any = None):
+    def get(self, key: str, default: Any = None) -> Any:
         res = getattr(self._obj, key, default)
         if isinstance(res, ReverseRelation):
             return res.related_objects

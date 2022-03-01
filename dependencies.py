@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer, SecurityScopes, HTTPBasic, HT
 from jose import JWTError, jwt
 from datetime import datetime, timezone
 from pydantic import ValidationError
-from typing import Optional
+from typing import Optional, Any
 
 from modules.users.models import User as UserModel
 from modules.users.schemas import UserWithScope, FullUser, JWTToken
@@ -17,7 +17,7 @@ security = HTTPBasic(auto_error=False)
 
 
 class CustomDepends:
-    def __init__(self, magick_word):
+    def __init__(self, magick_word: Any):
         self.magick_word = magick_word
 
     def __call__(self, q: str = Query(None, description="test custom depends")):
