@@ -17,6 +17,7 @@ class JWTToken(BaseModel):
 class AccessToken(BaseModel):
     token_type: str = Field("bearer")
     access_token: str
+    scope: List[str] = Field(default_factory=list)
 
 
 BaseUser = pydantic_model_creator(UserModel, name="BaseUser", include=("username", "email", "full_name", "is_active"))

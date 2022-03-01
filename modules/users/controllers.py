@@ -32,7 +32,7 @@ async def login(user: OAuth2PasswordRequestForm = Depends()):
         scopes=user.scopes
     )
     token = jwt.encode(jwt_token.dict(), key=SECRET_KEY, algorithm=ALGORITHM)
-    return {"access_token": token}
+    return {"access_token": token, "scope": user.scopes}
 
 
 @router.get("/users/me", tags=['users'], response_model=UserOutWithItems)
