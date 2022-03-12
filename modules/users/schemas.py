@@ -1,16 +1,21 @@
 from tortoise.contrib.pydantic import pydantic_model_creator
 from pydantic import BaseModel, Field, EmailStr, SecretStr
 from typing import List
-from datetime import datetime
+from datetime import datetime, timedelta
+from time import time
+from uuid import UUID, uuid1
 
 from modules.users.models import User as UserModel
 from modules.items.models import Item as ItemModel
+from settings import ACCESS_TOKEN_EXPIRE_MINUTES
 from utils import TortoiseGetterDict
 
 
 class JWTToken(BaseModel):
+    iat: int = Field(default_factory=lambda: int(time()))
+    jti: UUID = Field(default_factory=lambda: str(uuid1()))
     sub: str
-    exp: datetime
+    exp: datetime = Field(default_factory=lambda: datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     scopes: List[str] = Field(default_factory=list)
 
 
